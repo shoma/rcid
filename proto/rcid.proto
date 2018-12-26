@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package github.com.shoma.rcid.pb;
+option go_package = "pb";
+
+service Runner {
+    rpc Run (CommandRequest) returns (stream CommandResult) { }
+}
+
+message CommandRequest {
+    // PATH to command to execute. If request omit the shell param, this requires to absolute path.
+    string path = 1;
+    // Args to command.
+    repeated string arg = 2;
+    // Working Directory of the command
+    string workdir = 3;
+    // Environment Variables of the command.
+    map<string, string> env = 4;
+    // Timeout Second to finished the command. If command exceed the time, rcid send KILL signal to the command.
+    int32 timeout = 5;
+}
+
+message CommandResult {
+    // execution status of the command, if true the command did not finished with exit-status 0.
+    bool error = 1;
+    // the message of STDOUT
+    string stdout = 2;
+    // the message of STDERR
+    string stderr = 3;
+}
