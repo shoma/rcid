@@ -46,8 +46,8 @@ func (c *Command) envSlice() []string {
 	var rtn []string
 	for k, v := range c.env {
 		rtn = append(rtn, fmt.Sprintf("%s=%s", k, v))
-
 	}
+
 	return rtn
 }
 
