@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/shoma/rcid/pb"
 	"github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -22,10 +23,7 @@ var (
 )
 
 func main() {
-	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithInsecure())
-
-	conn, err := grpc.Dial(*addr, opts...)
+	conn, err := grpc.Dial(*addr, withDialOptions()...)
 	if err != nil {
 		log.Fatalf("failed to dial: %v", err)
 	}
@@ -39,6 +37,19 @@ func main() {
 	pflag.Parse()
 	run(client)
 
+}
+
+func withDialOptions() []grpc.DialOption {
+	var opts []grpc.DialOption
+	opts = append(opts, grpc.WithInsecure())
+	opts = append(opts, grpc.WithUserAgent("rci"))
+	opts = append(opts, withClientUnaryInterceptor())
+	return opts
+}
+
+
+func withClientUnaryInterceptor() grpc.DialOption {
+	return grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient())
 }
 
 func parseEnvArg() map[string]string {
